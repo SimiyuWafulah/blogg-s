@@ -5,9 +5,6 @@ import { errorHandler } from '../utils/error.js';
 export const signup = async (req, res, next) => {
     try {
         const {username, email, password} = req.body;
-        if(! username || email || password || username==='' || email==='' || password==='') {
-            return next(errorHandler(401, 'All fields are required'))
-        }
         //check if user exists
         const existingUser = await User.findOne({$or : [{email, password}]})
         if(existingUser) return next(errorHandler(409, 'Account already exists'))
