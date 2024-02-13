@@ -6,7 +6,8 @@ export default function SignUp() {
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  
 
   const handleChange = (e) => {
     setFormData({
@@ -83,7 +84,7 @@ export default function SignUp() {
             <div className=''>
               <Label value='Enter password'/>
               <TextInput
-                type='passoword'
+                type='password'
                 placeholder='password'
                 id='password'
                 onChange={handleChange}
