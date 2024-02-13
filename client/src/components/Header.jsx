@@ -10,7 +10,7 @@ import { toogleTheme } from '../redux/theme/theme.slice'
 export default function Header() {
   const dispatch = useDispatch()
     const path = useLocation().pathname
-    const {currentUser} = useSelector(state =>  state.user)
+    const {currentUser} = useSelector((state) =>  state.user)
     const {theme} = useSelector(state => state.theme)
   return (
     <Navbar className='border-b-2'>
