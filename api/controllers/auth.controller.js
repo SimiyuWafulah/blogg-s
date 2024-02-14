@@ -45,7 +45,7 @@ export const signin = async (req, res, next) => {
 }
 
 export const google = async (req, res, next) => {
-    const {name, email, photoURL} = req.body
+    const {name, email, photo} = req.body
    try {
     const user = await User.findOne({email});
     if(user) {
@@ -55,7 +55,7 @@ export const google = async (req, res, next) => {
     }else {
         const generatePassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8)
         const hashGeneratePassword = await bcryptjs.hash(generatePassword,10)
-        const newUser = new User({username : name.toLowerCase().split(' ').join('') + Math.random().toString(36).slice(-4), email, password: hashGeneratePassword, profilePic: photoURL});
+        const newUser = new User({username : name.toLowerCase().split(' ').join('') + Math.random().toString(36).slice(-4), email, password: hashGeneratePassword, profilePic: photo});
         await newUser.save();
         const token = jwt.sign({id: newUser._id}, process.env.JWT)
         const {password: pass, ...rest} = newUser._doc
