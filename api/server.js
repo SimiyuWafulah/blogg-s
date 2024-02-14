@@ -4,6 +4,7 @@ import userRoute from './routes/user.route.js'
 import authRoute from './routes/auth.route.js'
 import dotenv from 'dotenv';
 import cors from 'cors'
+import cookieParser from 'cookie-parser';
 import { errorMiddleware } from './middlewares/error.middleware.js';
 dotenv.config();
 
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use(cors({
     origin: '*'
 }))
+app.use(cookieParser());
 
 const PORT = process.env.PORT
 
