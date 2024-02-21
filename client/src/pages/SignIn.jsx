@@ -14,7 +14,7 @@ export default function SignIn() {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.id] :e.target.value
+      [e.target.id] : e.target.value
     })
   }
 
@@ -36,7 +36,6 @@ export default function SignIn() {
       const data = await res.json();
       if(data.success===false) {
        dispatch(signInFailure(data.message))
-       return
       }
       dispatch(signInSuccess(data))
       navigate('/')
@@ -74,7 +73,7 @@ export default function SignIn() {
             <div className=''>
               <Label value='Enter password'/>
               <TextInput
-                type='passoword'
+                type='password'
                 placeholder='********'
                 id='password'
                 onChange={handleChange}

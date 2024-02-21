@@ -95,8 +95,9 @@ export default function DashProfile() {
         const data = await res.json()
         if(data.success === false){
           dispatch(updateUserFailure(data.message))
+        }else{
+          dispatch(updateUserSuccess(data))
         }
-        dispatch(updateUserSuccess(data))
       } catch (error) {
         dispatch(updateUserFailure(error.message))
       }
