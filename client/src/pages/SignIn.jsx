@@ -85,9 +85,9 @@ export default function SignIn() {
                 loading ? (
                   <>
                     <Spinner className='sm'/>
-                    <span className='pl-3'>Signing Up...</span>
+                    <span className='pl-3'>Signing In...</span>
                   </>
-                ) : 'Sign Up'
+                ) : 'Sign In'
               }
             </Button>
             <Oauth/>
