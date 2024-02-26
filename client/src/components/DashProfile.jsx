@@ -30,6 +30,7 @@ export default function DashProfile() {
     const [imgFileUploading, setImgFileUploading] = useState(false)
     const [showModal, setShowModal] = useState(false)
     const navigate = useNavigate()
+    const accessToken = cookies.get('access_token')
 
     useEffect(() => {
       const imgUrlFromLocalStorage = localStorage.getItem('imgUrl');
@@ -108,14 +109,13 @@ export default function DashProfile() {
       try {
         dispatch(updateUserStart())
 
-        const accessToken = cookies.get('access_token')
+       
         const res = await fetch(`http://localhost:3000/api/user/update/${userId}`,{
           method: 'PUT',
           mode: 'cors',
           credentials : 'include',
           headers: {
-            'Content-Type' : 'application/json',
-            'Authorization': `Bearer ${accessToken}`
+            'Content-Type' : 'application/json'
           },
           body: JSON.stringify(formData)
         })
@@ -132,18 +132,20 @@ export default function DashProfile() {
     }
 
     const handleDelete = async () => {
-      setShowModal(false)
+      setShowModal(false);
+      
       try {
         dispatch(deleteUserStart())
         const res = await fetch (`http://localhost:3000/api/user/delete/${userId}`, {
-          method: 'DELETE'
+          method: 'DELETE',
+          mode : 'cors',
+          credentials : 'include'
         }) 
 
         const data = await res.json()
-        if (data.success === false) {
+        if(!res.ok) {
           dispatch(deleteUserFailure(data.message))
-        }
-        if(res.ok) {
+        }else{
           dispatch(deleteUserSuccess(data))
           navigate('/signin')
         }
