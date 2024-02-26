@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { signInStart, signInSuccess} from '../redux/user/user.slice'
 
+
 export default function Oauth() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -21,6 +22,7 @@ export default function Oauth() {
             const res = await fetch('http://localhost:3000/api/auth/google', {
                 method:'POST',
                 mode: 'cors',
+                credentials: 'include',
                 headers : {
                     'Content-Type' : 'application/json'
                 },

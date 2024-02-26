@@ -6,7 +6,7 @@ import {getDownloadURL, getStorage, ref, uploadBytesResumable} from 'firebase/st
 import { app } from '../../firebase'
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import { updateUserStart,updateUserSuccess,updateUserFailure, deleteUserStart, deleteUserSuccess, deleteUserFailure} from '../redux/user/user.slice'
+import { updateUserStart,updateUserSuccess,updateUserFailure, deleteUserStart, deleteUserSuccess, deleteUserFailure, signOutSuccess} from '../redux/user/user.slice'
 import { useDispatch } from 'react-redux'
 import {HiOutlineExclamationCircle} from 'react-icons/hi'
 import { useNavigate } from 'react-router-dom'
@@ -123,7 +123,7 @@ export default function DashProfile() {
         if(data.success === false){
           dispatch(updateUserFailure(data.message))
         }else{
-          dispatch(updateUserSuccess(data))
+          dispatch(updateUserSuccess())
           setUpdateSuccess('Update Successsful')
         }
       } catch (error) {
@@ -151,6 +151,22 @@ export default function DashProfile() {
         }
       } catch (error) {
         dispatch(deleteUserFailure(error.message))
+      }
+    }
+
+    const handleSignOut = async () => {
+      try{
+        const res = await fetch('http://localhost:3000/api/user/signout', {
+          method: 'POST',
+        })
+        const data = await res.json()
+        if (!res.ok) {
+          console.log(data.message)
+        }else{
+          dispatch(signOutSuccess(data))
+        }
+      } catch(error) {
+        console.log(error.message)
       }
     }
   return (
@@ -214,7 +230,7 @@ export default function DashProfile() {
         </form>
         <div className='text-red-500 flex justify-between mt-5'>
           <span className='cursor-pointer' onClick={() => setShowModal(true)}>Delete Account</span>
-          <span className='cursor-pointer'>Sign Out</span>
+          <span className='cursor-pointer' onClick={handleSignOut}>Sign Out</span>
         </div>
         {updateSuccess && (
           <Alert color='success' className='mt-5'>
