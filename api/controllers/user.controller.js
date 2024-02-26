@@ -41,7 +41,7 @@ export const updateUser = async (req, res, next) => {
           $set: {
             username: req.body.username,
             email: req.body.email,
-            profilePicture: req.body.profilePicture,
+            profilePic: req.body.profilePic,
             password: req.body.password,
           },
         },
@@ -51,5 +51,17 @@ export const updateUser = async (req, res, next) => {
       res.status(200).json(rest);
     } catch (error) {
       next(error);
+    }
+  }
+
+
+  export const deleteUser = async (req, res, next) => {
+    if(req.user.id !== req.params.userId) {
+      return next(errorHandler(403,'You are not allowed to delete the account'))
+    }
+    try {
+      await User.findByIdAndDelete(req.params.userId)
+    } catch (error) {
+      next(error)
     }
   }

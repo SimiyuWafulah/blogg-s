@@ -28,6 +28,7 @@ export default function SignIn() {
       const res = await fetch('http://localhost:3000/api/auth/signin', {
         method: 'POST',
         mode: 'cors',
+        credentials: 'include',
         headers : {
           'Content-Type': 'application/json'
         },

@@ -1,17 +1,22 @@
 import React, { useEffect, useState } from 'react'
 import {useSelector} from 'react-redux'
-import {Alert, Button, TextInput} from 'flowbite-react'
+import {Alert, Button, Modal, TextInput} from 'flowbite-react'
 import { useRef } from 'react'
 import {getDownloadURL, getStorage, ref, uploadBytesResumable} from 'firebase/storage'
 import { app } from '../../firebase'
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import { updateUserStart,updateUserSuccess,updateUserFailure } from '../redux/user/user.slice'
+import { updateUserStart,updateUserSuccess,updateUserFailure, deleteUserStart, deleteUserSuccess, deleteUserFailure} from '../redux/user/user.slice'
 import { useDispatch } from 'react-redux'
+import {HiOutlineExclamationCircle} from 'react-icons/hi'
+import { useNavigate } from 'react-router-dom'
+import Cookies from 'universal-cookie'
+
+const cookies = new Cookies()
 
 
 export default function DashProfile() {
-    const {currentUser} = useSelector(state => state.user)
+    const {currentUser, error} = useSelector(state => state.user)
     const [imgFile, setImgFile] = useState(null)
     const [imgUrl,setImgUrl] = useState(null)
     const fileRef = useRef()
@@ -23,6 +28,8 @@ export default function DashProfile() {
     const dispatch = useDispatch();
     const userId = currentUser._id
     const [imgFileUploading, setImgFileUploading] = useState(false)
+    const [showModal, setShowModal] = useState(false)
+    const navigate = useNavigate()
 
     useEffect(() => {
       const imgUrlFromLocalStorage = localStorage.getItem('imgUrl');
@@ -100,11 +107,15 @@ export default function DashProfile() {
       }
       try {
         dispatch(updateUserStart())
+
+        const accessToken = cookies.get('access_token')
         const res = await fetch(`http://localhost:3000/api/user/update/${userId}`,{
           method: 'PUT',
           mode: 'cors',
+          credentials : 'include',
           headers: {
-            'Content-Type' : 'application/json'
+            'Content-Type' : 'application/json',
+            'Authorization': `Bearer ${accessToken}`
           },
           body: JSON.stringify(formData)
         })
@@ -117,6 +128,27 @@ export default function DashProfile() {
         }
       } catch (error) {
         dispatch(updateUserFailure(error.message))
+      }
+    }
+
+    const handleDelete = async () => {
+      setShowModal(false)
+      try {
+        dispatch(deleteUserStart())
+        const res = await fetch (`http://localhost:3000/api/user/delete/${userId}`, {
+          method: 'DELETE'
+        }) 
+
+        const data = await res.json()
+        if (data.success === false) {
+          dispatch(deleteUserFailure(data.message))
+        }
+        if(res.ok) {
+          dispatch(deleteUserSuccess(data))
+          navigate('/signin')
+        }
+      } catch (error) {
+        dispatch(deleteUserFailure(error.message))
       }
     }
   return (
@@ -146,7 +178,7 @@ export default function DashProfile() {
             <img
               src={imgUrl || currentUser.profilePic}
               alt='user'
-              className={`rouned-full w-full h-full object-cover border-8 border-[lightgray] ${imgProgress < 100 && 'opacity-60'}`}
+              className={`rounded-full w-full h-full object-cover border-8 border-[lightgray] ${imgProgress < 100 && ''}`}
             />
           </div>
           {imgUploadError && (
@@ -179,7 +211,7 @@ export default function DashProfile() {
           </Button>
         </form>
         <div className='text-red-500 flex justify-between mt-5'>
-          <span className='cursor-pointer'>Delete Account</span>
+          <span className='cursor-pointer' onClick={() => setShowModal(true)}>Delete Account</span>
           <span className='cursor-pointer'>Sign Out</span>
         </div>
         {updateSuccess && (
@@ -192,6 +224,24 @@ export default function DashProfile() {
             {updateError}
           </Alert>
         )}
+        {error && (
+          <Alert color='failure' className='mt-5'>
+            {error}
+          </Alert>
+        )}
+        <Modal show={showModal} onClose={() =>setShowModal(false)} popup size='md'>
+          <Modal.Header/>
+          <Modal.Body>
+            <div className='text-center'>
+              <HiOutlineExclamationCircle className='h-14 w-14 text-gray-400  dark:text-gray-200 mb-4 mx-auto'/>
+              <h3 className='mb-5 text-lg text-gray-500 dark:text-gray-400'>Are you sure you want to delete this account?</h3>
+              <div className='flex justify-center gap-4'>
+                <Button color='failure' onClick={handleDelete}>Yes</Button>
+                <Button color='gray' onClick={() => setShowModal(false)}>No, cancel</Button>
+              </div>
+            </div>
+          </Modal.Body>
+        </Modal>
     </div>
   )
 }
