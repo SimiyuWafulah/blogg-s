@@ -6,7 +6,7 @@ import {getDownloadURL, getStorage, ref, uploadBytesResumable} from 'firebase/st
 import { app } from '../../firebase'
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import { updateUserStart,updateUserSuccess,updateUserFailure, deleteUserStart, deleteUserSuccess, deleteUserFailure, signOutSuccess} from '../redux/user/user.slice'
+import { updateUserStart,updateUserSuccess,updateUserFailure, deleteUserStart, deleteUserSuccess, deleteUserFailure,signOutSuccess} from '../redux/user/user.slice'
 import { useDispatch } from 'react-redux'
 import {HiOutlineExclamationCircle} from 'react-icons/hi'
 import { useNavigate } from 'react-router-dom'
@@ -30,7 +30,6 @@ export default function DashProfile() {
     const [imgFileUploading, setImgFileUploading] = useState(false)
     const [showModal, setShowModal] = useState(false)
     const navigate = useNavigate()
-    const accessToken = cookies.get('access_token')
 
     useEffect(() => {
       const imgUrlFromLocalStorage = localStorage.getItem('imgUrl');
@@ -109,13 +108,14 @@ export default function DashProfile() {
       try {
         dispatch(updateUserStart())
 
-       
+        const accessToken = cookies.get('access_token')
         const res = await fetch(`http://localhost:3000/api/user/update/${userId}`,{
           method: 'PUT',
           mode: 'cors',
           credentials : 'include',
           headers: {
-            'Content-Type' : 'application/json'
+            'Content-Type' : 'application/json',
+            'Authorization': `Bearer ${accessToken}`
           },
           body: JSON.stringify(formData)
         })
@@ -123,7 +123,7 @@ export default function DashProfile() {
         if(data.success === false){
           dispatch(updateUserFailure(data.message))
         }else{
-          dispatch(updateUserSuccess())
+          dispatch(updateUserSuccess(data))
           setUpdateSuccess('Update Successsful')
         }
       } catch (error) {
@@ -132,20 +132,18 @@ export default function DashProfile() {
     }
 
     const handleDelete = async () => {
-      setShowModal(false);
-      
+      setShowModal(false)
       try {
         dispatch(deleteUserStart())
         const res = await fetch (`http://localhost:3000/api/user/delete/${userId}`, {
-          method: 'DELETE',
-          mode : 'cors',
-          credentials : 'include'
+          method: 'DELETE'
         }) 
 
         const data = await res.json()
-        if(!res.ok) {
+        if (data.success === false) {
           dispatch(deleteUserFailure(data.message))
-        }else{
+        }
+        if(res.ok) {
           dispatch(deleteUserSuccess(data))
           navigate('/signin')
         }
@@ -163,7 +161,7 @@ export default function DashProfile() {
         if (!res.ok) {
           console.log(data.message)
         }else{
-          dispatch(signOutSuccess(data))
+          dispatch(signOutSuccess())
         }
       } catch(error) {
         console.log(error.message)
@@ -230,7 +228,7 @@ export default function DashProfile() {
         </form>
         <div className='text-red-500 flex justify-between mt-5'>
           <span className='cursor-pointer' onClick={() => setShowModal(true)}>Delete Account</span>
-          <span className='cursor-pointer' onClick={handleSignOut}>Sign Out</span>
+          <span className='cursor-pointer'onClick={handleSignOut}>Sign Out</span>
         </div>
         {updateSuccess && (
           <Alert color='success' className='mt-5'>

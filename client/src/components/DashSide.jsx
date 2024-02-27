@@ -27,7 +27,7 @@ export default function DashSide() {
       if (!res.ok) {
         console.log(data.message)
       }else{
-        dispatch(signOutSuccess(data))
+        dispatch(signOutSuccess())
       }
     } catch(error) {
       console.log(error.message)
