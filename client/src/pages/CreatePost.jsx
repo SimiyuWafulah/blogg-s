@@ -42,7 +42,7 @@ export default function CreatePost() {
        getDownloadURL(uploadTask.snapshot.ref).then((downloadUrl) => {
         setImageUploadProgress(null)
         setImageUploadError(null)
-        setFormData({...FormData, image: downloadUrl})
+        setFormData({...formData, image: downloadUrl})
        })
     }) 
   } catch (error) {
@@ -72,7 +72,7 @@ export default function CreatePost() {
     }
     setPublishError(null)
     setPublishSuccess('published')
-    navigate('/posts')
+    navigate(`/post/${data.slug}`)
   } catch (error) {
     setPublishError('Something went wrong, try again')
   }
