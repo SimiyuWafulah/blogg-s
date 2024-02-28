@@ -32,6 +32,6 @@ app.listen(PORT, () => {
 
 app.use('/api/user', userRoute);
 app.use('/api/auth', authRoute);
-app.use('api/post', postRoute)
+app.use('/api/post', postRoute)
 
 app.use(errorMiddleware);
