@@ -37,7 +37,7 @@ export default function DashPosts() {
     const res = await fetch(`http://localhost:3000/api/post/getposts?userId=${currentUser._id}&startIndex=${startIndex}`);
     const data = await res.json()
     if(res.ok) {
-      setUserPosts([...userPosts,...data.posts])
+      setUserPosts((prev) => [...prev, ...data.posts])
       if(data.posts.length <9) {
         setShowMore(false)
       }
