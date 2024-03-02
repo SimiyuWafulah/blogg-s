@@ -2,6 +2,7 @@ import {React, useEffect,useState} from 'react'
 import {useParams, Link} from 'react-router-dom';
 import {Spinner, Button} from 'flowbite-react';
 import CallToAction from '../components/CallToAction';
+import Comments from '../components/Comments';
 
 
 export default function Posts() {
@@ -62,6 +63,7 @@ export default function Posts() {
       <div className='max-w-4xl mx-auto w-full'>
        <CallToAction/>
       </div>
+      <Comments postId={post._id}/>
     </main>
   )
 }
