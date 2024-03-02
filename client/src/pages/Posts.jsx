@@ -1,6 +1,8 @@
 import {React, useEffect,useState} from 'react'
 import {useParams, Link} from 'react-router-dom';
 import {Spinner, Button} from 'flowbite-react';
+import CallToAction from '../components/CallToAction';
+
 
 export default function Posts() {
     const {postSlug} = useParams();
@@ -54,7 +56,12 @@ export default function Posts() {
         <span>{post && new Date(post.createdAt).toLocaleDateString()}</span>
         <span className='italic'>{post && (post.content.length/1000).toFixed(0)} mins read</span>
       </div>
-      <div className='p-3 w-full post-content' dangerouslySetInnerHTML={{__html: post && post.content}}></div>
+      <div className='p-3 w-full post-content' dangerouslySetInnerHTML={{__html: post && post.content}}>
+      
+      </div>
+      <div className='max-w-4xl mx-auto w-full'>
+       <CallToAction/>
+      </div>
     </main>
   )
 }
