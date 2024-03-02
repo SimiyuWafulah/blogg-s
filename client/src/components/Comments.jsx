@@ -1,15 +1,34 @@
 import {Alert, Button, Textarea } from 'flowbite-react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {useSelector} from 'react-redux'
 import { Link } from 'react-router-dom'
 import Cookies from 'universal-cookie'
+import Comment from './Comment'
 
 export default function Comments({postId}) {
     const {currentUser} = useSelector(state => state.user)
     const [comment, setComment] = useState("")
+    const [comments, setComments] = useState([])
     const [commentError, setCommentError] = useState(null)
     const [commentSuccess, setCommentSuccess] = useState(false)
     const cookies = new Cookies()
+
+    useEffect(() => {
+      try {
+        const fetchComments = async () => {
+          const res = await fetch(`http://localhost:3000/api/comment/getPostcomments/${postId}`)
+          const data = await res.json()
+          if(!res.ok){
+            setCommentError(data.message)
+          } else {
+            setComments(data)
+          }
+        }
+        fetchComments();
+      } catch (error) {
+        console.log(error)
+      }
+    },[postId])
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -44,8 +63,9 @@ export default function Comments({postId}) {
                 setCommentSuccess('comment submitted')
                 setTimeout(() => {
                     setCommentSuccess(false)
-                },4000)
+                },4000);
                 setComment("")
+                setComments([data, ...comments])
             }
         } catch (error) {
             setCommentError(error.message)
@@ -87,6 +107,21 @@ export default function Comments({postId}) {
       )}
       {commentSuccess && (
         <Alert className='mt-5' type='success'>{commentSuccess}</Alert>
+      )}
+      {comments.length === 0 ? (
+        <p className='text-sm my-7'>Be the first one to comment</p>
+      ): (
+        <>
+        <div className='flex text-sm my-5 items-center gap-1'>
+          <p>Comments</p>
+          <div className='border border-gray-400 py-1 px-2 rounded-sm'>
+            <p>{comments.length}</p>
+          </div>
+        </div>
+        {comments.map((comment) => (
+          <Comment key={comment._id} comment={comment}/>
+        ))}
+        </>
       )}
     </div>
   )
