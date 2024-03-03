@@ -4,6 +4,7 @@ import {useSelector} from 'react-redux'
 import { Link } from 'react-router-dom'
 import Cookies from 'universal-cookie'
 import Comment from './Comment'
+import {useNavigate} from 'react-router-dom'
 
 export default function Comments({postId}) {
     const {currentUser} = useSelector(state => state.user)
@@ -11,6 +12,7 @@ export default function Comments({postId}) {
     const [comments, setComments] = useState([])
     const [commentError, setCommentError] = useState(null)
     const [commentSuccess, setCommentSuccess] = useState(false)
+    const navigate = useNavigate();
     const cookies = new Cookies()
 
     useEffect(() => {
@@ -71,6 +73,38 @@ export default function Comments({postId}) {
             setCommentError(error.message)
         }
     }
+
+    const handleLikes = async (commentId) => {
+      try {
+        if(!currentUser) {
+          navigate('/signin')
+          return;
+        }
+        const res = await fetch(`http://localhost:3000/api/comment/like/${commentId}`, {
+          method: 'PUT',
+          mode: 'cors',
+          credentials: 'include',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${cookies.get('access_token')}`
+          }
+        })
+        if(res.ok){
+         const data = await res.json()
+         setComments(comments.map((comment) => 
+         comment._id === commentId ? {
+           ...comment,
+           likes: data.likes,
+           numberOfLikes: data.likes.length,
+         } : comment
+       ));
+       
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
   return (
     <div className='max-w-2xl mx-auto w-full p-3'>
       {currentUser ? (
@@ -119,7 +153,7 @@ export default function Comments({postId}) {
           </div>
         </div>
         {comments.map((comment) => (
-          <Comment key={comment._id} comment={comment}/>
+          <Comment key={comment._id} comment={comment} onLike={handleLikes}/>
         ))}
         </>
       )}
